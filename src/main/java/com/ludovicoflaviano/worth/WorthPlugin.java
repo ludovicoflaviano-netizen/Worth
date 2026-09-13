@@ -35,6 +35,7 @@ public final class WorthPlugin extends JavaPlugin {
         worthService = new WorthService(this);
         tooltipListener = new WorthTooltipListener(this);
         Bukkit.getPluginManager().registerEvents(tooltipListener, this);
+        for (Player player : Bukkit.getOnlinePlayers()) tooltipListener.cleanup(player);
 
         PluginCommand command = getCommand("worth");
         if (command != null) {
@@ -45,9 +46,6 @@ public final class WorthPlugin extends JavaPlugin {
 
         setupBalanceObjective();
         startBalanceTask();
-        Bukkit.getScheduler().runTaskTimer(this, () -> {
-            if (tooltipListener != null) for (Player player : Bukkit.getOnlinePlayers()) tooltipListener.update(player);
-        }, 20L, Math.max(20L, getConfig().getLong("tooltip.refresh-ticks", 100L)));
         getLogger().info("Worth enabled.");
     }
 
