@@ -49,6 +49,11 @@ public final class WorthService {
         }
     }
 
+    public void clearCache() {
+        // Worth prices are resolved directly from EconomyShopGUI on each calculation.
+        // Kept as a no-op compatibility method for reload callers.
+    }
+
     public double getInventoryWorth(Player player) {
         double total = 0.0;
         for (ItemStack item : player.getInventory().getStorageContents()) total += getWorth(player, item).valueIfPresent();
