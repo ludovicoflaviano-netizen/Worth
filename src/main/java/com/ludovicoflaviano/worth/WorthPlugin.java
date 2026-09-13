@@ -2,8 +2,6 @@ package com.ludovicoflaviano.worth;
 
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -92,8 +90,12 @@ public final class WorthPlugin extends JavaPlugin {
         }
         long interval = Math.max(1L, getConfig().getLong("balance.update-ticks", 20L));
         Bukkit.getScheduler().runTaskTimer(this, () -> {
-            if (balanceObjective == null || economy == null) {
+            if (balanceObjective == null) {
                 return;
+            }
+            if (economy == null) {
+                setupEconomy();
+                if (economy == null) return;
             }
             for (Player player : Bukkit.getOnlinePlayers()) {
                 double balance = economy.getBalance(player);
