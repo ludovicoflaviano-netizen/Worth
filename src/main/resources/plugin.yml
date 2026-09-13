@@ -1,0 +1,24 @@
+name: Worth
+version: 1.0.0
+main: com.ludovicoflaviano.worth.WorthPlugin
+api-version: '1.21'
+author: Ludovico Calvaro
+description: DonutSMP-style item worth values using EconomyShopGUI and Vault 2.0.
+website: https://github.com/ludovicoflaviano-netizen/Worth
+softdepend:
+  - Vault
+  - EconomyShopGUI
+  - EconomyShopGUI-Premium
+commands:
+  worth:
+    description: View the EconomyShopGUI sell worth of an item.
+    usage: /worth [hand|inventory|item]
+    aliases: [value, itemworth]
+    permission: worth.use
+permissions:
+  worth.use:
+    description: Use /worth.
+    default: true
+  worth.admin:
+    description: Reload Worth.
+    default: op

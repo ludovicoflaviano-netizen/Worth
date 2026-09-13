@@ -1,0 +1,33 @@
+# Worth configuration
+# Item values come directly from EconomyShopGUI sell prices.
+
+worth:
+  # Include the amount in /worth hand and /worth inventory totals.
+  use-item-amounts: true
+
+  # Number of decimal places for displayed command values when Vault does not format them.
+  decimal-places: 2
+
+balance:
+  # Show the player's Vault balance in the vanilla BELOW_NAME scoreboard slot.
+  enabled: true
+
+  # Green $ is the objective title. The numeric balance is shown under each username.
+  symbol: '$'
+
+  # Refresh interval in ticks. 20 = once per second.
+  update-ticks: 20
+
+  # Round the balance because vanilla BELOW_NAME scores are integers.
+  round-decimals: true
+
+messages:
+  prefix: '<green>$</green> <gray>Worth</gray> <dark_gray>»</dark_gray> '
+  no-price: '<red>This item is not sellable in EconomyShopGUI.</red>'
+  no-economy: '<red>Vault economy was not found.</red>'
+  no-shop: '<red>EconomyShopGUI was not found.</red>'
+  hand: '<gray><item> x<amount> is worth <green><price></green></gray>'
+  total: '<gray>Your inventory is worth <green><price></green></gray>'
+  reloaded: '<green>Worth configuration reloaded.</green>'
+  player-only: '<red>This command can only be used by a player.</red>'
+  usage: '<gray>Usage: <white>/worth [hand|inventory|item]</white></gray>'
