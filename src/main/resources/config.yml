@@ -2,7 +2,7 @@
 # Item values come directly from EconomyShopGUI sell prices.
 
 tooltip:
-  enabled: true
+  enabled: false
   prefix: "💵"
   format: "%s Worth: %s"
   refresh-ticks: 100
