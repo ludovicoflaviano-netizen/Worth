@@ -43,7 +43,7 @@ public final class WorthTooltipListener implements Listener {
                 .serialize(component).startsWith(WORTH_PREFIX));
 
         if (plugin.getConfig().getBoolean("tooltip.enabled", true)) {
-            WorthService.OptionalDoubleValue value = plugin.getWorthService().getWorth(player, item);
+            WorthService.OptionalDoubleValue value = plugin.getWorthService().getUnitWorth(player, item.getType());
             if (value.present()) {
                 Component line = Component.text("$", NamedTextColor.GREEN)
                         .append(Component.text(" Worth: ", NamedTextColor.GRAY))
@@ -51,8 +51,11 @@ public final class WorthTooltipListener implements Listener {
                 lore.add(line);
             }
         }
-        meta.lore(lore.isEmpty() ? null : lore);
-        item.setItemMeta(meta);
+        List<Component> oldLore = meta.hasLore() && meta.lore() != null ? meta.lore() : List.of();
+        if (!oldLore.equals(lore)) {
+            meta.lore(lore.isEmpty() ? null : lore);
+            item.setItemMeta(meta);
+        }
     }
 
     private void scheduleUpdate(Player player) {
