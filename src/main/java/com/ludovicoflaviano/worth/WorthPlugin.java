@@ -33,7 +33,6 @@ public final class WorthPlugin extends JavaPlugin {
         worthService = new WorthService(this);
         tooltipListener = new WorthTooltipListener(this);
         Bukkit.getPluginManager().registerEvents(tooltipListener, this);
-        for (Player player : Bukkit.getOnlinePlayers()) tooltipListener.cleanup(player);
 
         PluginCommand command = getCommand("worth");
         if (command != null) {
