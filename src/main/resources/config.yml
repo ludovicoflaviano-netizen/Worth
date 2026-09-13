@@ -1,6 +1,12 @@
 # Worth configuration
 # Item values come directly from EconomyShopGUI sell prices.
 
+tooltip:
+  enabled: true
+  prefix: "💵"
+  format: "%s Worth: %s"
+  refresh-ticks: 100
+
 worth:
   # Include the amount in /worth hand and /worth inventory totals.
   use-item-amounts: true
