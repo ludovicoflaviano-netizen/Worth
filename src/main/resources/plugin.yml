@@ -9,7 +9,17 @@ softdepend:
   - Vault
   - EconomyShopGUI
   - EconomyShopGUI-Premium
+commands:
+  worth:
+    description: Shows the sell value of an item or inventory.
+    usage: /worth [hand|inventory|item]
+    permission: worth.use
+    aliases: [itemworth]
+
 permissions:
+  worth.use:
+    description: Use the /worth command.
+    default: true
   worth.admin:
     description: Reload Worth.
     default: op
