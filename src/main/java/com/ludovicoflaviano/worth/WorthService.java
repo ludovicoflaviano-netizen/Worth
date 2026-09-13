@@ -14,8 +14,7 @@ public final class WorthService {
     public OptionalDoubleValue getWorth(Player player, ItemStack item) {
         if (item == null || item.getType().isAir()) return OptionalDoubleValue.empty();
         int amount = Math.max(1, item.getAmount());
-        ItemStack one = item.clone();
-        one.setAmount(1);
+        ItemStack one = item.asOne();
         Double unitPrice = findUnitSellPrice(player, one);
         return unitPrice == null ? OptionalDoubleValue.empty() : OptionalDoubleValue.of(unitPrice * amount);
     }
