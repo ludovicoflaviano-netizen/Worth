@@ -13,10 +13,13 @@ public final class WorthService {
 
     public OptionalDoubleValue getWorth(Player player, ItemStack item) {
         if (item == null || item.getType().isAir()) return OptionalDoubleValue.empty();
-        int amount = Math.max(1, item.getAmount());
-        ItemStack one = item.asOne();
-        Double unitPrice = findUnitSellPrice(player, one);
-        return unitPrice == null ? OptionalDoubleValue.empty() : OptionalDoubleValue.of(unitPrice * amount);
+        final int amount = Math.max(1, item.getAmount());
+        final ItemStack one = item.asOne(); // clone; original inventory stack is never changed
+        Double unit = findUnitSellPrice(player, one);
+        if (unit == null || !Double.isFinite(unit) || unit < 0) return OptionalDoubleValue.empty();
+        double total = unit * amount;
+        if (!Double.isFinite(total)) return OptionalDoubleValue.empty();
+        return OptionalDoubleValue.of(total);
     }
 
     public OptionalDoubleValue getUnitWorth(Player player, Material material) {
@@ -27,39 +30,46 @@ public final class WorthService {
     private Double findUnitSellPrice(Player player, ItemStack one) {
         Double price = findPrice(player, one);
         if (price != null) return price;
-        return findPrice(player, new ItemStack(one.getType(), 1));
+        // EconomyShopGUI can have material-only entries; retry without custom components.
+        if (one.getType().isItem()) return findPrice(player, new ItemStack(one.getType(), 1));
+        return null;
     }
 
     private Double findPrice(Player player, ItemStack one) {
-        ShopItem shopItem;
         try {
-            shopItem = EconomyShopGUIHook.getShopItem(player, one);
+            ShopItem shopItem = player == null
+                    ? EconomyShopGUIHook.getShopItem(one)
+                    : EconomyShopGUIHook.getShopItem(player, one);
             if (shopItem == null) shopItem = EconomyShopGUIHook.getShopItem(one);
-        } catch (Throwable t) {
-            plugin.getLogger().fine("Could not resolve EconomyShopGUI item for " + one.getType() + ": " + t.getMessage());
-            return null;
-        }
-        if (shopItem == null || !EconomyShopGUIHook.isSellAble(shopItem)) return null;
-        try {
-            Double price = EconomyShopGUIHook.getItemSellPrice(shopItem, one, player, 1, 0);
+            if (shopItem == null || !EconomyShopGUIHook.isSellAble(shopItem)) return null;
+
+            Double price = player == null
+                    ? EconomyShopGUIHook.getItemSellPrice(shopItem, one, null, 1, 0)
+                    : EconomyShopGUIHook.getItemSellPrice(shopItem, one, player, 1, 0);
             return price != null && Double.isFinite(price) && price >= 0 ? price : null;
         } catch (Throwable t) {
-            plugin.getLogger().fine("Could not read EconomyShopGUI sell price for " + one.getType() + ": " + t.getMessage());
+            plugin.getLogger().fine("Unable to resolve sell price for " + one.getType() + ": " + t.getClass().getSimpleName());
             return null;
         }
     }
 
     public void clearCache() {
-        // Worth prices are resolved directly from EconomyShopGUI on each calculation.
-        // Kept as a no-op compatibility method for reload callers.
+        // Intentionally uncached. EconomyShopGUI prices are read fresh on each calculation.
     }
 
     public double getInventoryWorth(Player player) {
+        if (player == null) return 0.0;
         double total = 0.0;
-        for (ItemStack item : player.getInventory().getStorageContents()) total += getWorth(player, item).valueIfPresent();
-        for (ItemStack item : player.getInventory().getArmorContents()) total += getWorth(player, item).valueIfPresent();
-        total += getWorth(player, player.getInventory().getItemInOffHand()).valueIfPresent();
+        for (ItemStack item : player.getInventory().getStorageContents()) total = safeAdd(total, getWorth(player, item));
+        for (ItemStack item : player.getInventory().getArmorContents()) total = safeAdd(total, getWorth(player, item));
+        total = safeAdd(total, getWorth(player, player.getInventory().getItemInOffHand()));
         return total;
+    }
+
+    private double safeAdd(double total, OptionalDoubleValue value) {
+        if (!value.present()) return total;
+        double result = total + value.value();
+        return Double.isFinite(result) ? result : total;
     }
 
     public record OptionalDoubleValue(boolean present, double value) {
